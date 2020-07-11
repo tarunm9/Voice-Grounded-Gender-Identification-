@@ -1,0 +1,806 @@
+<!DOCTYPE HTML>
+<html lang="en" class="no-js">
+
+    <head>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Upload - GI</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+        <script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/all.js') }}"></script>
+        <style>
+            body {
+                width: 100vw;
+                height: 100vh;
+                background-color: rgb(0, 0, 0);
+                box-sizing: border-box;
+                font-family: 'Lato', sans-serif;
+                overflow-x: hidden;
+            }
+
+            body:after {
+                content: "";
+                height: inherit;
+                width: inherit;
+                position: fixed;
+                top: 0%;
+                left: 0%;
+                opacity: 0.8;
+                background: linear-gradient(rgba(11, 12, 16, 0.8), rgba(11, 12, 16, 1));
+                z-index: -1;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: auto;
+                width: 100vw;
+                background: #0b0c10;
+            }
+
+            header {
+                font-family: "Oswald Stencil";
+                position: fixed;
+                text-align: center;
+                font-size: 350%;
+                top: 50%;
+                width: 100%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: -1;
+                letter-spacing: 2px;
+            }
+
+            header .bold {
+                font-weight: 700;
+                color: transparent;
+                /*text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;*/
+                text-shadow: -1px -1px 0px transparent, -1px -1px 0px transparent, -1px -1px 5px #00f7ff, -1px -1px 10px #00f7ff, -1px -1px 20px #055cb4;
+                /*text-shadow: 0 0 5px transparent, 0 0 10px transparent, 0 0 15px #00f7ff, 0 0 20px #055cb4, 0 0 25px #055cb4, 0 0 30px #055cb4, 0 0 35px #055cb4;*/
+                -webkit-text-stroke: 0.5px #00ffea;
+                -webkit-text-fill-color: transparent;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+            }
+
+            header .notBold {
+                font-weight: 400;
+                color: #056b6b;
+                letter-spacing: 3px;
+            }
+
+            input:hover {
+                cursor: pointer;
+            }
+
+            #labelFile:after {
+                background-color: rgb(11, 12, 16);
+                border-left: 1px solid #00f7ff;
+                margin: 0px;
+                color: white;
+            }
+
+            #labelFile {
+                background: transparent;
+                color: #00f7ff;
+                font-size: 13px;
+                font-weight: 400;
+                border: 1px solid rgba(255, 255, 255, 0.164);
+                height: 35px;
+            }
+
+            .btn {
+                height: 35px;
+                font-size: 13px;
+                font-weight: 400;
+                color: #00f7ff;
+                background: transparent;
+                border-radius: 0px;
+                border: 1px solid rgba(0, 225, 255, 0.15);
+                transition: all 0.5s;
+                outline: none;
+            }
+
+            .uploadBtn {
+                border-radius: 0px 5px 5px 0px;
+            }
+
+            .btn:hover {
+                color: white;
+                border-color: #00ccff;
+                background-color: rgba(0, 225, 255, 0.15);
+                box-shadow: 0 0 5px transparent, 0 0 5px transparent, 0 0 20px #00f7ff, 0 0 20px #055cb4;
+            }
+
+            #recorder_win {
+                color: white;
+            }
+
+            #recorder_win button {
+                border-radius: 0;
+            }
+
+            .starbtn {
+                padding: 1.5% 2.5%;
+                font-size: 80%;
+                font-weight: bold;
+                max-width: 50%;
+                max-height: 15%;
+                color: #00f7ff;
+                background: transparent;
+                border: 1px solid rgba(0, 225, 255, 0.15);
+                border-radius: 10px;
+                transition-duration: 0.5s;
+            }
+
+            .stopbtn,
+            .playbtn,
+            .uploadbtn {
+                margin: 0% 2%;
+                padding: 1.5% 2.5%;
+                font-size: 80%;
+                color: #00f7ff;
+                background: transparent;
+                border: 1px solid transparent;
+                font-weight: bold;
+                max-width: 50%;
+                max-height: 15%;
+                transition-duration: 0.5s;
+            }
+
+            #countdown {
+                background: transparent;
+                border: 1px solid rgba(0, 110, 255, 0.267);
+                color: #00f7ff;
+            }
+
+            canvas {
+                width: 100%;
+                height: 80px;
+            }
+
+            .player {
+                background-color: rgba(0, 225, 255, 0.15);
+                ;
+                font-family: 'Verdana';
+            }
+
+            .song_title {
+                color: aqua;
+                font-size: 0.9em;
+                position: relative;
+            }
+
+            .song_slider {
+                width: 100%;
+            }
+
+            .current_time,
+            .duration {
+                color: aqua;
+                font-size: 0.8em;
+            }
+
+            .play_btn,
+            .volume_btn,
+            .download_btn {
+                cursor: pointer;
+                font-size: 1.0em;
+                border: none;
+                background-color: transparent;
+                transition: all 0.5s;
+                color: #00ccff;
+            }
+
+            .close_btn {
+                cursor: pointer;
+                font-size: 1.5em;
+                border: none;
+                background-color: transparent;
+                transition: all 0.5s;
+                color: #00ccff;
+            }
+
+            .play_btn:hover,
+            .volume_btn:hover,
+            .download_btn:hover,
+            .close_btn:hover {
+                color: white;
+                background-color: transparent;
+            }
+
+            #seek_bar,
+            #volume_bar {
+                cursor: pointer;
+                width: 100%;
+                height: 5px;
+                color: green;
+                font-size: 12px;
+                border: none;
+                margin-right: 10px;
+                background: #01313a;
+                border-radius: 9px;
+            }
+
+            #fill,
+            #fill_volume {
+                height: 5px;
+            }
+
+        </style>
+
+        <script>
+            document.onreadystatechange = function () {
+                if (document.readyState == "interactive") {
+                    document.querySelector("body").style.visibility = "hidden";
+                    document.querySelector("#loader").style.visibility = "visible";
+                } else {
+                    document.querySelector("#loader").style.display = "none";
+                    document.querySelector("body").style.visibility = "visible";
+                }
+            };        
+        </script>
+    </head>
+
+    <body>
+        <div id="loader"></div>
+        <nav class="sidenav navbar nav fixed-top d-flex justify-content-center" id="navigation">
+            <ul>
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="active nav-item"><a href="upload.html">Upload</a></li>
+                <li class="nav-item"><a href="traintest.html">Train</a></li>
+                <li class="nav-item"><a href="fidb.html">Test & Result</a></li>
+            </ul>
+        </nav>
+        <header><span class="bold">Gender Idenification</span><span class="notBold"> by Voice </span></header>
+        <main style="padding-top: 5em;" id="main">
+            <div class="container-fluid" id="container">
+                <div class="row p-3">
+                    <div class="col-lg-12">
+                        <div class="progress d-none" id="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary active"
+                                id="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0"
+                                aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--  Record or Upload voice -->
+                <div class="row mb-2 px-3">
+
+                    <!--  Choose audio file -->
+                    <div class="col-lg-6 mb-2">
+                        <div class="row">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" accept="audio/wav,audio/mp3"
+                                        class="custom-file-input form-control" id="audioFile" name="audio_file">
+                                    <label class="custom-file-label" for="audioFile" id="labelFile">Choose audio
+                                        file</label>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="upload_play_btn btn btn-default py-2 ml-2" id="upload_play_btn"
+                                        onclick="play_audio();" disabled>
+                                        <svg class="bi bi-play-fill" width="1em" height="1em" viewBox="0 0 16 16"
+                                            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 010 1.393z" />
+                                        </svg>
+                                    </button>
+                                    <button class="uploadBtn btn btn-default py-2 ml-1" onclick="file_upload();"
+                                        id="upload_audio_btn" disabled>Upload</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Record voice -->
+                    <div class="col-lg-6">
+                        <div id="recorder_win" class="d-inline">
+                            <div><b class="mr-3">RECORDER : </b>
+                                <button id="startbtn" class="starbtn">RECORD</button>
+                                <button id="stopbtn" class="stopbtn" disabled>STOP</button>
+                                <button id="playbtn" class="playbtn" disabled>PLAY</button>
+                                <button id="uploadbtn" class="uploadbtn" disabled>UPLOAD</button>
+                                <span id="countdown" class="ml-5 d-none p-2">20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row px-3">
+                    <div class="col-lg-12" style="color: white;">
+                        <table style="font-family: sans-serif;font-size: 14px;">
+                            <tbody>
+                                <tr>
+                                    <td><b>Note: </b></td>
+                                    <td colspan="1"></td>
+                                    <td> Please select audio file has duration less than 20seconds.</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td colspan="1"></td>
+                                    <td>Use Earphones to prevent noise.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <!-- Audio Player -->
+                <div class="row p-2 d-none mx-auto justify-content-center" id="audio_player">
+                    <div class="col-lg-6">
+                        <div class="player py-1 px-3">
+                            <div class="row px-2 text-center" style="vertical-align: middle;">
+                                <div class="col-lg-1 p-0 my-auto">
+                                    <button class="play_btn" id="play_btn" onclick="play(this);"><i
+                                            class="fas fa-play"></i></button>
+                                </div>
+                                <div class="col my-auto" id="song_title_wrapper">
+                                    <div id="song_title" class="song_title">Song Title will goes here</div>
+                                </div>
+                                <div class="col-lg-1 p-0">
+                                    <button class="close_btn" id="close_btn"><i
+                                            class="far fa-window-close"></i></button>
+                                </div>
+
+                            </div>
+                            <div class="row pt-2 px-2" style="vertical-align: middle;">
+                                <div class="col-lg-1 pr-1 pl-0 my-auto">
+                                    <span id="current_time" class="current_time">00:00</span>
+                                </div>
+                                <div class="col my-auto">
+                                    <div id="seek_bar">
+                                        <div id="fill"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1 pl-1 pr-0 my-auto">
+                                    <span id="duration" class="duration">00:00</span>
+                                </div>
+                                <div class="col-lg-1 my-auto">
+                                    <button class="volume_btn" id="volume_btn" onclick="mute_unmute(this);"><i
+                                            class="fas fa-volume-up"></i></button>
+                                </div>
+                                <div class="col-lg-3 my-auto">
+                                    <div id="volume_bar">
+                                        <div id="fill_volume"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Frequency and sine graph -->
+                <div class="row px-3 d-none" id="audio_analyser">
+                    <div class="col-lg-4 mb-3 p-1 text-center">
+                        <h6 style="color: white;">Voice Frequency Bar Graph</h6>
+                        <canvas id="frequency_canvas"></canvas>
+                    </div>
+                    <div class="col-lg-4 p-1 text-center">
+                        <h6 style="color: white;">Waveform</h6>
+                        <canvas id="sine_canvas"></canvas>
+                    </div>
+                    <div class="col-lg-4 p-1 text-center">
+                        <h6 style="color: white;">Spectogram</h6>
+                        <canvas id="spec_canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Alert Message -->
+                <div class="row px-3" id="recordingList">
+                    <div class="col-lg-6" id="file_upload_message">
+                        {% if error %}
+                        <div class="col-lg-12 alert alert-danger alert-dismissible fade show rounded" id="messages"
+                            role="alert">
+                            <b style="color: red;">Message:</b> {{ error }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        {% endif %}
+                        {% if success %}
+                        <div class="col-lg-12 alert alert-success alert-dismissible fade show rounded" id="messages"
+                            role="alert">
+                            <b style="color: green;">Message:</b> {{ success }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row" id="recorder_part">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="footer fixed-bottom"
+            style="text-align: center; font-size: small;padding-bottom: 5px;color:rgba(33, 86, 107, 0.95);background-color: rgb(11, 12, 16);">
+            Copyright&copy; 2020. Designed by Sanjay, Shivam, Tarun and Yashwanth</footer>
+
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.4.1.slim.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/chroma.min.js') }}"></script>
+        <script type="text/javascript" src="static/js/audio_player.js"></script>
+        <script>
+            $(".custom-file-input").on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+        </script>
+        <script type="text/javascript">
+            function close_element(element) {
+                element.parentElement.style.display = 'none';
+            }
+            function return_id(element) {
+                return document.getElementById(element);
+            }
+
+            var upload_play_btn = return_id("upload_play_btn"),
+                upload_audio_btn = return_id("upload_audio_btn"),
+                recordButton = return_id('startbtn'),
+                stopButton = return_id('stopbtn'),
+                playButton = return_id('playbtn'),
+                uploadButton = return_id('uploadbtn'),
+                progress = return_id("progress"),
+                progress_bar = return_id("progress-bar"),
+                countdown = return_id("countdown"),
+                cur_time = 20, counter, current_song = null;
+            var sec, audio_file;
+
+
+            document.getElementById("audioFile").addEventListener("change", async function () {
+                console.log("Input has Changed");
+                if (document.getElementById("audioFile").files[0] != undefined) {
+                    audio_file = document.getElementById("audioFile").files[0];
+                    var song = new Audio();
+                    song.src = window.URL.createObjectURL(audio_file);
+                    song.addEventListener('loadedmetadata', function () {
+                        sec = Math.floor(song.duration) % 60;
+                    });
+                    upload_audio_btn.disabled = false;
+                    upload_play_btn.disabled = false;
+                }
+            });
+
+            async function play_audio() {
+                console.log("Checking any Existing Audio Player is running..");
+                if (document.getElementById("audioMask") != null) {
+                    console.log("Audio Player was found and closing it.");
+                    var node = document.getElementById("audioMask");
+                    node.parentNode.removeChild(node);
+                }
+                console.log("No running Audio player was found. Continuing.");
+
+                if (document.getElementById("audioFile").files[0] != undefined) {
+                    console.log("Reading Audio file");
+                    current_song = document.getElementById("audioFile").files[0];
+                    await play_song(current_song);
+                }
+                else {
+                    console.log("No audio file found to play!!.");
+                    document.getElementById("audioFile").focus();
+                }
+            }
+
+            function file_upload() {
+                if (audio_file != undefined) {
+                    if (!(sec <= 20)) {
+                        console.log("Duration of uploading file:" + sec);
+                        col = document.createElement("div");
+                        col.setAttribute('class', 'col-lg-12');
+                        col.setAttribute('id', 'file_message');
+                        col.innerHTML = '<div class="alert alert-danger alert-dismissible fade show rounded" role="alert"><b style="color: red;">Message: </b>' + " File has Duration greater than 20 seconds" + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+                        document.getElementById("file_upload_message").appendChild(col);
+                        return;
+                    }
+                    else {
+                        progress.classList.remove("d-none");
+                        var xhr = new XMLHttpRequest();
+                        var fd = new FormData();
+                        fd.append("audio_file", audio_file);
+                        fd.set("enctype", "multipart/form-data");
+                        xhr.open("POST", "/uploadfiles", true);
+                        xhr.responseType = "text";
+                        xhr.upload.addEventListener("progress", function (e) {
+                            // Get the loaded amount and total filesize (bytes)
+                            var loaded = e.loaded;
+                            var total = e.total
+
+                            // Calculate percent uploaded
+                            var percent_complete = (loaded / total) * 100;
+
+                            // Update the progress text and progress bar
+                            progress_bar.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+                            progress_bar.innerText = `${Math.floor(percent_complete)}%`;
+
+                        });
+
+                        xhr.send(fd);
+                        xhr.onload = function () {
+                            if (xhr.readyState === xhr.DONE) {
+                                if (xhr.status === 200) {
+                                    progress.classList.add("d-none");
+                                    document.getElementById("audioFile").setAttribute("value", "");
+                                    document.getElementById("labelFile").innerText = "Choose audio file";
+                                    if (document.getElementById("file_message") != null) {
+                                        var node = document.getElementById("file_message");
+                                        node.parentNode.removeChild(node);
+                                    }
+                                    col = document.createElement("div");
+                                    col.setAttribute('class', 'col-lg-12');
+                                    col.setAttribute('id', 'file_message');
+                                    col.innerHTML = xhr.responseText;
+                                    document.getElementById("file_upload_message").appendChild(col);
+
+                                }
+                            }
+                        }
+
+                        xhr.onerror = function () {
+                            console.log(`Error during the upload: ${xhr.status}`);
+                        };
+                    }
+                } else {
+                    console.log("No audio file found to Upload!!.");
+                    document.getElementById("audioFile").focus();
+                }
+            }
+
+            function set_style(element, disabled, bg_color, clr, box_shadow, border_color, cur) {
+                element.disabled = disabled;
+                element.style.backgroundColor = bg_color;
+                element.style.col = clr;
+                element.style.boxShadow = box_shadow;
+                element.style.borderColor = border_color;
+                element.style.cursor = cur;
+            }
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                console.log('getUserMedia supported.');
+                navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false
+                }).then(function (stream) {
+                    console.log("Initializing record..");
+                    const mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.stream = stream;
+                    mediaRecorder.audioChannels = 1;
+                    var audioChunks = [];
+                    mediaRecorder.bufferSize = 4096;
+                    var file = null;
+                    recordButton.addEventListener("click", async function () {
+                        if (document.getElementById("recording_message") != null) {
+                            var node = document.getElementById("recording_message");
+                            node.parentNode.removeChild(node);
+                        }
+                        audioChunks = [];
+                        counter = await setInterval(function () {
+                            if (cur_time <= 0) {
+                                clearInterval(counter);
+                                stopButton.click();
+                                countdown.innerHTML = 20;
+                                cur_time = 20;
+                            }
+                            if (cur_time < 10) {
+                                cur_time = '0' + cur_time;
+                            }
+                            countdown.innerHTML = cur_time;
+                            cur_time = cur_time - 1;
+                        }, 1000);
+                        await countdown.classList.remove('d-none');
+                        set_style(recordButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        set_style(stopButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        set_style(playButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        set_style(uploadButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        mediaRecorder.start();
+                        play_stream(stream);
+                    });
+
+                    stopButton.addEventListener("click", async function () {
+                        mediaRecorder.stop();
+                        stop_stream();
+
+                        countdown.classList.add("d-none");
+                        clearInterval(counter);
+                        countdown.innerHTML = 20;
+                        cur_time = 20;
+
+                        set_style(recordButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        set_style(stopButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        set_style(playButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        set_style(uploadButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                    });
+
+                    playButton.addEventListener("click", async function () {
+                        if (document.getElementById("recording_message") != null) {
+                            var node = document.getElementById("recording_message");
+                            node.parentNode.removeChild(node);
+                        }
+                        var blob = new Blob(audioChunks, {
+                            type: 'audio/webm'
+                        });
+                        var today = new Date();
+                        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                        var time = today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
+                        var today_date_time = date + "_" + time;
+                        file = new File([blob], "record" + today_date_time + blob.size + ".webm", {
+                            type: "audio/webm",
+                        });
+                        await play_src(file);
+                    });
+
+                    uploadButton.addEventListener("click", function () {
+                        progress.classList.remove("d-none");
+                        try {
+                            if (file != null || file != undefined) {
+                                var xhr = new XMLHttpRequest();
+                                var fd = new FormData();
+                                fd.append("audio_file", file);
+                                fd.set("enctype", "multipart/form-data");
+                                xhr.open("POST", "/uploadfiles", true);
+                                xhr.responseType = "text";
+
+                                xhr.upload.addEventListener("progress", function (e) {
+                                    // Get the loaded amount and total filesize (bytes)
+                                    var loaded = e.loaded;
+                                    var total = e.total
+
+                                    // Calculate percent uploaded
+                                    var percent_complete = (loaded / total) * 100;
+
+                                    // Update the progress text and progress bar
+                                    progress_bar.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+                                    progress_bar.innerText = `${Math.floor(percent_complete)}%`;
+
+                                });
+
+                                xhr.send(fd);
+
+                                xhr.onload = function () {
+                                    if (xhr.readyState === xhr.DONE) {
+                                        if (xhr.status === 200) {
+                                            progress.classList.add("d-none");
+                                            if (document.getElementById("recording_message") != null) {
+                                                var node = document.getElementById("recording_message");
+                                                node.parentNode.removeChild(node);
+                                            }
+                                            console.log(xhr.responseText);
+                                            col = document.createElement("div");
+                                            col.setAttribute('class', 'col-lg-12');
+                                            col.setAttribute('id', 'recording_message');
+                                            col.innerHTML = xhr.responseText;
+                                            document.getElementById("recorder_part").appendChild(col);
+
+                                            set_style(playButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                                            set_style(uploadButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+
+                                            if (document.getElementById("audioMask") != null) {
+                                                var node = document.getElementById("audioMask");
+                                                node.parentNode.removeChild(node);
+                                            }
+                                        }
+                                    }
+                                };
+                                xhr.onerror = function () {
+                                    console.log(`Error during the upload: ${xhr.status}`);
+                                };
+                            }
+                        } catch (error) {
+                            console.log("Error while uploading:" + error);
+                        }
+                    });
+
+                    recordButton.addEventListener("mouseover", function () {
+                        if (recordButton.disabled == true) {
+                            set_style(recordButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(recordButton, false, "rgba(0, 225, 255, 0.15)", "white", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+                    recordButton.addEventListener("mouseout", function () {
+                        if (recordButton.disabled == true) {
+                            set_style(recordButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(recordButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+
+                    stopButton.addEventListener("mouseover", function () {
+                        if (stopButton.disabled == true) {
+                            set_style(stopButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(stopButton, false, "rgba(0, 225, 255, 0.15)", "white", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+                    stopButton.addEventListener("mouseout", function () {
+                        if (stopButton.disabled == true) {
+                            set_style(stopButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(stopButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+
+                    playButton.addEventListener("mouseover", function () {
+                        if (playButton.disabled == true) {
+                            set_style(playButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(playButton, false, "rgba(0, 225, 255, 0.15)", "white", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+                    playButton.addEventListener("mouseout", function () {
+                        if (playButton.disabled == true) {
+                            set_style(playButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(playButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+
+                    uploadButton.addEventListener("mouseover", function () {
+                        if (uploadButton.disabled == true) {
+                            set_style(uploadButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(uploadButton, false, "rgba(0, 225, 255, 0.15)", "white", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+                    uploadButton.addEventListener("mouseout", function () {
+                        if (uploadButton.disabled == true) {
+                            set_style(uploadButton, true, "transparent", "#00f7ff", "none", "transparent", "none");
+                        } else {
+                            set_style(uploadButton, false, "transparent", "#00f7ff", "none", "rgba(0, 225, 255, 0.15)", "pointer");
+                        }
+                    });
+
+                    mediaRecorder.ondataavailable = function (event) {
+                        audioChunks.push(event.data);
+                    }
+
+                }).catch(function (e) {
+                    countdown.classList.add('d-none');
+                    if (document.getElementById("recording_message") != null) {
+                        var node = document.getElementById("recording_message");
+                        node.parentNode.removeChild(node);
+                    }
+                    recordButton.disabled = false;
+                    recordButton.style.backgroundColor = "transparent";
+                    recordButton.style.color = "#00f7ff";
+                    recordButton.style.boxShadow = "none";
+                    recordButton.style.borderColor = "rgba(0, 225, 255, 0.15)";
+                    recordButton.style.cursor = "pointer";
+
+                    stopButton.disabled = true;
+                    stopButton.style.backgroundColor = "transparent";
+                    stopButton.style.color = "#00f7ff";
+                    stopButton.style.boxShadow = "none";
+                    stopButton.style.borderColor = "transparent";
+                    stopButton.style.cursor = "none";
+
+                    playButton.disabled = true;
+                    playButton.style.backgroundColor = "transparent";
+                    playButton.style.color = "#00f7ff";
+                    playButton.style.boxShadow = "none";
+                    playButton.style.borderColor = "transparent";
+                    playButton.style.cursor = "none";
+
+                    uploadButton.disabled = true;
+                    uploadButton.style.backgroundColor = "transparent";
+                    uploadButton.style.color = "#00f7ff";
+                    uploadButton.style.boxShadow = "none";
+                    uploadButton.style.borderColor = "transparent";
+                    uploadButton.style.cursor = "none";
+
+                    console.error('media error', e);
+                });
+            }
+        </script>
+    </body>
+
+</html>

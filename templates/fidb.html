@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Test & Result - GI</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
+        <script src="{{ url_for('static', filename='js/modernizr.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/wavesurfer.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/all.js') }}"></script>
+        <style>
+            body {
+                width: 100vw;
+                height: 100vh;
+                background-color: rgb(0, 0, 0);
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+
+            body:after {
+                content: "";
+                height: inherit;
+                width: inherit;
+                position: fixed;
+                top: 0%;
+                left: 0%;
+                opacity: 0.8;
+                background: linear-gradient(to right, rgba(11, 12, 16, 0.8), rgba(11, 12, 16, 1));
+                z-index: -1;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: auto;
+                width: 100vw;
+                background: rgba(11, 12, 16, 1);
+            }
+
+            header {
+                font-family: "Oswald Stencil";
+                position: fixed;
+                text-align: center;
+                font-size: 350%;
+                top: 50%;
+                width: 100%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: -1;
+                letter-spacing: 2px;
+            }
+
+            header .bold {
+                font-weight: 700;
+                text-transform: uppercase;
+                color: transparent;
+                /*text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;*/
+                text-shadow: -1px -1px 0px transparent, -1px -1px 0px transparent, -1px -1px 5px #00f7ff, -1px -1px 10px #00f7ff, -1px -1px 20px #055cb4;
+                /*text-shadow: 0 0 5px transparent, 0 0 10px transparent, 0 0 15px #00f7ff, 0 0 20px #055cb4, 0 0 25px #055cb4, 0 0 30px #055cb4, 0 0 35px #055cb4;*/
+                -webkit-text-stroke: 0.5px #00ffea;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: 3px;
+            }
+
+            header .notBold {
+                font-weight: 300;
+                color: #056b6b;
+                letter-spacing: 3px;
+            }
+
+            table tr {
+                font-size: 13px;
+                color: white;
+            }
+
+            th,
+            td {
+                padding: 5px;
+            }
+
+            a {
+                cursor: pointer;
+            }
+
+            #track:hover {
+                text-decoration: underline;
+            }
+
+            #resultTable thead,
+            #resultTable2 thead {
+                background-color: rgba(0, 225, 255, 0.4);
+                color: #00f7ff;
+            }
+
+
+            .player {
+                background-color: rgba(0, 225, 255, 0.15);
+                ;
+                font-family: 'Verdana';
+            }
+
+            .song_title {
+                color: aqua;
+                font-size: 0.9em;
+                position: relative;
+            }
+
+            .song_slider {
+                width: 100%;
+            }
+
+            .current_time,
+            .duration {
+                color: aqua;
+                font-size: 0.8em;
+            }
+
+            .play_btn,
+            .volume_btn,
+            .download_btn {
+                cursor: pointer;
+                font-size: 1.0em;
+                border: none;
+                background-color: transparent;
+                transition: all 0.5s;
+                color: #00ccff;
+            }
+
+            .close_btn {
+                cursor: pointer;
+                font-size: 1.5em;
+                border: none;
+                background-color: transparent;
+                transition: all 0.5s;
+                color: #00ccff;
+            }
+
+            .play_btn:hover,
+            .volume_btn:hover,
+            .download_btn:hover,
+            .close_btn:hover {
+                color: white;
+                background-color: transparent;
+            }
+
+            #seek_bar,
+            #volume_bar {
+                cursor: pointer;
+                width: 100%;
+                height: 5px;
+                color: green;
+                font-size: 12px;
+                border: none;
+                margin-right: 10px;
+                background: #01313a;
+                border-radius: 9px;
+            }
+
+            canvas {
+                width: 100%;
+                height: 80px;
+            }
+
+            #fill,
+            #fill_volume {
+                height: 5px;
+                background-color: #00f7ff;
+            }
+
+        </style>
+
+        <script type="text/javascript">
+            document.onreadystatechange = function () {
+                if (document.readyState !== "complete") {
+                    document.querySelector("body").style.visibility = "hidden";
+                    document.querySelector("#loader").style.visibility = "visible";
+                } else {
+                    document.querySelector("#loader").style.display = "none";
+                    document.querySelector("body").style.visibility = "visible";
+                }
+            };
+        </script>
+    </head>
+
+    <body>
+        <div id="loader"></div>
+        <nav class="sidenav navbar nav fixed-top d-flex justify-content-center">
+            <ul>
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="nav-item"><a href="upload.html">Upload</a></li>
+                <li class="nav-item"><a href="traintest.html">Train</a></li>
+                <li class="active nav-item"><a href="fidb.html">Test & Result</a></li>
+            </ul>
+        </nav>
+        <header><span class="bold">Gender Idenification</span><span class="notBold"> by Voice </span></header>
+        <main id="main" class="pt-5">
+            <div class="p-3"></div>
+            <!-- Progress Bar and Files -->
+            <div class="container-fluid">
+                <div class="row mb-2 px-2">
+                    <div class="col-lg-12">
+                        <div class="progress d-none" id="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info active"
+                                id="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0"
+                                aria-valuemax="100">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Messages -->
+                {% if error == true %}
+                <div class="row justify-content-center mb-3 px-2">
+                    <div class="col-md-6">
+                        <div class="alert  alert-danger alert-dismissible fade show rounded" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Files -->
+                {% if fidb == true %}
+                <div class="row mb-3 px-2" style="background-color: rgba(11, 12, 16,0.8);">
+                    <div class="col-lg-12">
+                        <table class="table table-borderless px-2">
+                            <thead style="border-bottom: 1px solid white; text-align:center;">
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in result %}
+                                <tr scope="row" style="vertical-align: middle; text-align:center;">
+                                    <td>{{ row[1] }}</td>
+                                    <td>{{ row[2] }}</td>
+                                    <td>
+                                        <button class="btn btn-outline-primary btn-sm" name="{{ row[1] }}"
+                                            onclick="play_song_file('{{ row[1] }}');">Play</button>
+                                        <a href="/delete_audio_file/{{ row[0] }}"><button
+                                                class="btn btn-outline-danger btn-sm ml-1">Delete</button></a>
+                                        <button class="btn btn-outline-info btn-sm ml-1"
+                                            onclick="test_voice('{{ row[1] }}')">Test</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Audio Player and graph -->
+            <div class="container-fluid">
+                <!-- Audio Player -->
+                <div class="row p-2 d-none mx-auto justify-content-center" id="audio_player">
+                    <div class="col-lg-6">
+                        <div class="player py-1 px-2">
+                            <div class="row px-2" style="vertical-align: middle;">
+                                <div class="col-lg-1 px-1 my-auto">
+                                    <span id="current_time" class="current_time">00:00</span>
+                                </div>
+                                <div class="col my-auto">
+                                    <div id="seek_bar">
+                                        <div id="fill"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1 pl-1 pr-0 my-auto">
+                                    <span id="duration" class="duration">00:00</span>
+                                </div>
+                                <div class="col-lg-1 my-auto">
+                                    <button class="volume_btn" id="volume_btn">
+                                        <i class="fas fa-volume-up"></i>
+                                    </button>
+                                </div>
+                                <div class="col-lg-3 my-auto">
+                                    <div id="volume_bar">
+                                        <div id="fill_volume"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row text-center pt-2 px-2" style="vertical-align: middle;">
+                                <div class="col-lg-1 p-0 my-auto">
+                                    <button class="play_btn" id="play_btn" onclick="play(this);"><i
+                                            class="fas fa-play"></i></button>
+                                </div>
+                                <div class="col my-auto" id="song_title_wrapper">
+                                    <div id="song_title" class="song_title">Song Title will goes here</div>
+                                </div>
+                                <div class="col-lg-1 p-0 my-auto">
+                                    <button class="download_btn" id="download_btn" onclick="download_audio();"><i
+                                            class="fas fa-download"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 p-0">
+                        <button class="close_btn" id="close_btn"><i class="far fa-window-close"></i></button>
+                    </div>
+                </div>
+                <!-- Frequency and sine graph -->
+                <div class="row px-3 d-none" id="audio_analyser">
+                    <div class="col-lg-4 mb-3 p-1 text-center">
+                        <h6 style="color: white;">Voice Frequency Bar Graph</h6>
+                        <canvas id="frequency_canvas"></canvas>
+                    </div>
+                    <div class="col-lg-4 p-1 text-center">
+                        <h6 style="color: white;">Waveform</h6>
+                        <canvas id="sine_canvas"></canvas>
+                    </div>
+
+                    <div class="col-lg-4 p-1 text-center">
+                        <h6 style="color: white;">Spectogram</h6>
+                        <canvas id="spec_canvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="container-fluid">
+                <div id="result_show" class="p-2 d-none"
+                    style="background: rgba(11, 12, 16,0.99);width: 100%;letter-spacing: 1px;">
+                    <p class="m-3" style="color: white;text-align: center;" id="final_result">Result:</p>
+                    <div id="waveform_wrapper" style="overflow-y: auto;"></div>
+                </div>
+            </div>
+
+        </main>
+        <footer class="footer fixed-bottom"
+            style="text-align: center; font-size: small;padding-bottom: 5px;color:rgba(33, 86, 107, 0.95);background-color: rgba(11, 12, 16, 0.9);">
+            Copyright&copy; 2020. Designed by Sanjay, Shivam, Tarun and Yashwanth</footer>
+
+
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.4.1.slim.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/chroma.min.js') }}"></script>
+        <script type="text/javascript" src="static/js/audio_player.js"></script>
+        <script type="text/javascript">
+            var progress = document.getElementById("progress");
+            var progress_bar = document.getElementById("progress-bar");
+            var result_show = document.getElementById("result_show");
+
+            function test_voice(filename) {
+                progress.classList.remove("d-none")
+                result_show.classList.add('d-none');
+
+                if (document.getElementById("btn_wrapper") != null) {
+                    var node = document.getElementById("btn_wrapper");
+                    node.parentNode.removeChild(node);
+                }
+                if (document.getElementsByTagName("wave") != null) {
+                    var nodes = document.getElementsByTagName("wave");
+                    for (var i = 0; i < nodes.length; i++) {
+                        nodes[i].parentNode.removeChild(nodes[i]);
+                    }
+                }
+                if (document.getElementById("result") != null) {
+                    var node = document.getElementById("result");
+                    node.parentNode.removeChild(node);
+                }
+                var xhr = new XMLHttpRequest();
+                var fd = new FormData();
+                fd.append("test_voice_file", filename);
+                fd.set("enctype", "multipart/form-data");
+                xhr.open("POST", "/test_voice", true);
+                xhr.responseType = "text";
+                xhr.upload.addEventListener("progress", function (e) {
+                    // Get the loaded amount and total filesize (bytes)
+                    var loaded = e.loaded;
+                    var total = e.total;
+                    var percent_complete = (loaded / total) * 100;
+                    progress_bar.setAttribute("style", `width: ${Math.floor(percent_complete)}%`);
+                    progress_bar.innerText = `${Math.floor(percent_complete)}%`;
+                });
+
+                xhr.send(fd);
+
+                xhr.onload = function () {
+                    if (xhr.readyState === xhr.DONE) {
+                        if (xhr.status === 200) {
+                            progress.classList.add("d-none");
+                            var response = xhr.responseText;
+                            var json = JSON.parse(response);
+                            var container = document.createElement('div');
+                            container.setAttribute('class', 'container mt-3');
+                            container.setAttribute('id', 'result');
+                            var row = document.createElement('div');
+                            row.setAttribute('class', 'row');
+                            row.setAttribute('style', 'background-color:rgba(11, 12, 16,0.8);');
+
+                            /*  Result Table 1*/
+                            var col1 = document.createElement('col');
+                            col1.setAttribute('class', 'col-lg-6');
+                            var table1 = document.createElement('table');
+                            table1.setAttribute('class', 'table table-borderless px-3');
+                            var thead1 = document.createElement('thead');
+                            table1.setAttribute('id', 'resultTable');
+                            var tbody1 = document.createElement('tbody');
+                            thead1.innerHTML = "<tr><th scope='col'>#</th><th scope='col'>Model</th><th scope='col'>Label</th></tr>";
+                            var knn = document.createElement('tr');
+                            knn.innerHTML = "<td scope='row'>1</td><td>k-NearestNeighbor</td><td>" + json['knn'] + "</td>";
+                            var rfc = document.createElement('tr');
+                            rfc.innerHTML = "<td scope='row'>2</td><td>RandomForestClassifier</td><td>" + json['rfc'] + "</td>";
+                            var nb = document.createElement('tr');
+                            nb.innerHTML = "<td scope='row'>3</td><td>NaiveBayes</td><td>" + json['nb'] + "</td>";
+                            var svm = document.createElement('tr');
+                            svm.innerHTML = "<td scope='row'>4</td><td>SupportVectorMachine</td><td>" + json['svm'] + "</td>";
+                            tbody1.appendChild(knn);
+                            tbody1.appendChild(rfc);
+                            tbody1.appendChild(nb);
+                            tbody1.appendChild(svm);
+                            table1.appendChild(thead1);
+                            table1.appendChild(tbody1);
+                            col1.appendChild(table1);
+                            row.appendChild(col1);
+
+                            /* Result Table 2 */
+                            var col2 = document.createElement('col');
+                            var table2 = document.createElement('table');
+                            var thead2 = document.createElement('thead');
+                            var tbody2 = document.createElement('tbody');
+                            col2.setAttribute('class', 'col-lg-6');
+                            table2.setAttribute('class', 'table table-borderless px-3');
+                            table2.setAttribute('id', 'resultTable2');
+                            thead2.innerHTML = "<tr><th scope='col'>Mean Frequency</th><th scope='col'>Min Frequency</th><th scope='col'>Max Frequency</th><th scope='col'>Sp Entropy</th></tr>";
+                            var lst = document.createElement('tr');
+                            lst.innerHTML = "<td>" + json['mean_fun'] + " Hz</td><td>" + json['min_fun'] + " Hz</td><td>" + json['max_fun'] + " Hz</td><td>" + json['sp_ent'] + "</td>";
+                            tbody2.appendChild(lst);
+                            table2.appendChild(thead2);
+                            table2.appendChild(tbody2);
+                            col2.appendChild(table2);
+                            row.appendChild(col2);
+                            container.appendChild(row);
+                            result_show.appendChild(container);
+                            var btn_wrapper = document.createElement('div');
+                            btn_wrapper.setAttribute('id', 'btn_wrapper');
+                            btn_wrapper.setAttribute('class', 'text-center');
+                            var button = document.createElement('button');
+                            button.setAttribute('class', 'btn btn-outline-info');
+                            button.innerText = "Play | Pause";
+                            btn_wrapper.appendChild(button)
+                            document.getElementById("waveform_wrapper").appendChild(btn_wrapper);
+                            var wavesurfer = WaveSurfer.create({
+                                container: '#waveform_wrapper',
+                                waveColor: 'violet',
+                                progressColor: 'purple',
+                                hideScrollbar: true
+                            });
+
+                            wavesurfer.load("static/uploads/" + filename);
+                            document.getElementById("final_result").innerHTML = "Result: <b style='color:#00f7ff;text-transform:uppercase;'>" + json['rfc'] + "</b>";
+                            result_show.classList.remove('d-none');
+                            button.onclick = function () {
+                                if (wavesurfer.isPlaying()) {
+                                    wavesurfer.pause();
+                                } else {
+                                    wavesurfer.play();
+                                }
+                            }
+                        }
+                    }
+                }
+                xhr.onerror = function () {
+                    console.log(`Error during the upload: ${xhr.status}`);
+                };
+            }
+
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,78 @@
+body{    
+    font-family: 'Source Sans Pro',"Roboto","Open Sans", "Montserrat","Century Gothic",Helvetica,sans-serif;
+}
+#loader { 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: rgb(1, 49, 39);
+    transform: translate(-50%,-50%);
+    border: 12px solid #00ffb3; 
+    border-radius: 50%; 
+    border-top: 12px solid #353333; 
+    width: 70px; 
+    height: 70px; 
+    animation: spin 1s linear infinite; 
+} 
+
+@keyframes spin {
+    0%{
+        transform: rotate(0deg);
+    }
+    25%{
+        transform: rotate(90deg);
+    }
+    50%{
+        transform: rotate(180deg);
+    }
+    75%{
+        transform: rotate(270deg);
+    }
+    100% { 
+        transform: rotate(360deg); 
+    } 
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: auto;
+    width: 100vw;
+}
+nav ul{
+    list-style: none;
+    margin: 0;
+    padding: 0px;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav ul li{    
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    padding: 10px;
+}
+
+nav ul li.active a{
+    color: #00f7ff;
+}
+
+nav ul li a {
+    text-decoration: none;
+    line-height: inherit;
+    font-size: 0.9em;
+    font-family: 'Source Sans Pro',"Montserrat" sans-serif;
+    text-transform: uppercase;
+    color: #0a4141;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+nav ul li a:hover {
+    color: #00f7ff;
+}
