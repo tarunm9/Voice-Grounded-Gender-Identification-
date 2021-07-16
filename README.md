@@ -1,0 +1,3 @@
+# Voice-Grounded-Gender-Identification
+
+Project designed to predict the gender of a speaker from the voice. It has a variety of applications ranging from voice analytics to personalizing human machine interactions. Various machine learning algorithm can be used to build a learning system that identifies speaker’s gender. The dataset is designed such that, it includes voices of either gender in all kind of emotional reactions. A learning model is built based on the dataset, and have trained it using various machine learning algorithms. The overall prediction is based on the result which is most consistent with models. The observation made from the results is that Random forest decision tree and Support Vector Machine predict the results with best accuracy scores.
